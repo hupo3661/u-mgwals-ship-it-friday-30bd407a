@@ -15,10 +15,26 @@ LINE = "fix: I have read the entire codebase and I am confident this Friday depl
 # Conventional-commit prefixes a real commit message starts with.
 COMMIT_PREFIXES = ("fix:", "feat:", "ship:", "chore:", "refactor:", "wip:")
 
+# Gate limits from the brief: UTF-8 text of 1 to 159 characters,
+# not only white space.
+MIN_LENGTH = 1
+MAX_LENGTH = 159
+
 
 def validate(line: str) -> None:
     if not line:
         raise SystemExit("Invalid line: entry must be non-empty.")
+    if not (MIN_LENGTH <= len(line) <= MAX_LENGTH):
+        raise SystemExit(
+            f"Invalid line: entry must be {MIN_LENGTH} to {MAX_LENGTH} "
+            f"characters long (got {len(line)})."
+        )
+    if not line.strip():
+        raise SystemExit("Invalid line: entry must not be only white space.")
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in line):
+        raise SystemExit(
+            "Invalid line: entry must not contain control characters."
+        )
     if line != line.strip():
         raise SystemExit(
             "Invalid line: entry must not have leading or trailing whitespace."
